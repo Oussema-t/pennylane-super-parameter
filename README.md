@@ -59,10 +59,27 @@ the state `|001⟩` forces the ratio `c₀/c₂` to be even/odd while `|100⟩` 
 odd/even, which no single rational number satisfies. Some entangling correction is
 unavoidable.
 
+## Mathematical derivation
+
+[`docs/derivation.pdf`](docs/derivation.pdf) derives the whole circuit from three lines of
+modular arithmetic and assumes no prior quantum computing. It covers: the minimum of qubit
+maths needed (states, measurement, global phase, the `RX` gate and when it lands on a basis
+state), the reduction of the problem to `Θ_k ≡ π·b_k (mod 2π)`, the wire-by-wire derivation
+that forces every gate and angle, a verification table for all eight inputs, a state-by-state
+walk-through for `n = 3`, a proof that the crossed-out `2π` rotations are harmless global
+phases, and a parity proof that uncontrolled rotations alone can never work.
+
+Rebuild it with [Tectonic](https://tectonic-typesetting.github.io):
+
+```bash
+cd docs && tectonic derivation.tex
+```
+
 ## Files
 
 | path | what it is |
 |---|---|
+| `docs/derivation.pdf` | Full mathematical derivation of the architecture, written for readers new to quantum computing (LaTeX source alongside) |
 | `super_parameter.ipynb` | Challenge statement, derivation, solution, circuit drawing and the official test harness, executed with outputs |
 | `solution.py` | The complete challenge file, ready to paste into the PennyLane editor |
 | `simulator/index.html` | Standalone interactive simulator, open it in any browser |
