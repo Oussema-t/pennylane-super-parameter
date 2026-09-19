@@ -1,0 +1,732 @@
+<title>Super Parameter Composer</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#f4f4f4; --surface:#ffffff; --surface-2:#f4f4f4; --border:#e0e0e0; --border-strong:#c6c6c6;
+  --ink:#161616; --ink-2:#525252; --ink-3:#8d8d8d;
+  --accent:#0f62fe; --accent-hover:#0353e9; --accent-ink:#ffffff; --accent-soft:#edf5ff;
+  --gate:#9f1853; --gate-ink:#ffffff;
+  --bar:#0f62fe; --bar-hover:#0043ce; --grid:#e0e0e0;
+  --wire:#8d8d8d; --wire-strong:#161616;
+  --good-ink:#0e6027; --good-bg:#defbe6; --mixed-ink:#684e00; --mixed-bg:#fcf4d6;
+  --topbar-bg:#161616; --topbar-ink:#f4f4f4; --topbar-ink-2:#c6c6c6;
+  --focus:#0f62fe;
+  --q0:#8a3ffc; --q1:#007d79; --q2:#ba4e00;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161616; --surface:#262626; --surface-2:#393939; --border:#393939; --border-strong:#525252;
+    --ink:#f4f4f4; --ink-2:#c6c6c6; --ink-3:#8d8d8d;
+    --accent:#78a9ff; --accent-hover:#a6c8ff; --accent-ink:#161616; --accent-soft:#1d2b47;
+    --gate:#ee5396; --gate-ink:#161616;
+    --bar:#78a9ff; --bar-hover:#a6c8ff; --grid:#393939;
+    --wire:#8d8d8d; --wire-strong:#f4f4f4;
+    --good-ink:#6fdc8c; --good-bg:#0b3d1c; --mixed-ink:#f1c21b; --mixed-bg:#3a2e00;
+    --topbar-bg:#0b0b0b; --topbar-ink:#f4f4f4; --topbar-ink-2:#c6c6c6;
+    --focus:#78a9ff;
+    --q0:#be95ff; --q1:#08bdba; --q2:#ff832b;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161616; --surface:#262626; --surface-2:#393939; --border:#393939; --border-strong:#525252;
+  --ink:#f4f4f4; --ink-2:#c6c6c6; --ink-3:#8d8d8d;
+  --accent:#78a9ff; --accent-hover:#a6c8ff; --accent-ink:#161616; --accent-soft:#1d2b47;
+  --gate:#ee5396; --gate-ink:#161616;
+  --bar:#78a9ff; --bar-hover:#a6c8ff; --grid:#393939;
+  --wire:#8d8d8d; --wire-strong:#f4f4f4;
+  --good-ink:#6fdc8c; --good-bg:#0b3d1c; --mixed-ink:#f1c21b; --mixed-bg:#3a2e00;
+  --topbar-bg:#0b0b0b; --topbar-ink:#f4f4f4; --topbar-ink-2:#c6c6c6;
+  --focus:#78a9ff;
+  --q0:#be95ff; --q1:#08bdba; --q2:#ff832b;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;font-size:14px;line-height:1.45;padding-inline:16px;padding-block:0 40px;-webkit-font-smoothing:antialiased}
+.mono{font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-variant-numeric:tabular-nums}
+.app{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+
+/* top strip */
+.topbar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 24px;background:var(--topbar-bg);color:var(--topbar-ink);padding:12px 16px;margin-top:16px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{width:22px;height:22px;flex:none}
+.brand-name{font-weight:600;font-size:15px;letter-spacing:.01em}
+.brand-sub{color:var(--topbar-ink-2);font-size:12px}
+.topbar-right{color:var(--topbar-ink-2);font-size:12px;display:flex;gap:16px;flex-wrap:wrap}
+.topbar-right b{color:var(--topbar-ink);font-weight:500}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:2px;min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--border)}
+.card-h h2{font-size:12px;font-weight:600;margin:0;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.card-h .meta{font-size:12px;color:var(--ink-3)}
+.card-b{padding:16px}
+.eyebrow{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:500}
+
+/* alpha controller */
+.alpha-grid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px;align-items:end}
+.alpha-slider-wrap{display:flex;flex-direction:column;gap:8px;min-width:0}
+input[type=range]{width:100%;accent-color:var(--accent);margin:6px 0}
+.slider-scale{display:flex;justify-content:space-between;font-size:10px;color:var(--ink-3);padding:0 2px}
+.alpha-values{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}
+.alpha-big{font-size:34px;font-weight:500;line-height:1;letter-spacing:-.01em}
+.alpha-big small{font-size:18px;color:var(--ink-2);font-weight:400}
+.alpha-rad{font-size:12px;color:var(--ink-2)}
+.alpha-input{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--ink-2);grid-column:1/-1;flex-wrap:wrap}
+.alpha-input input[type=number]{width:96px;padding:6px 8px;border:1px solid var(--border-strong);border-bottom-color:var(--ink-2);background:var(--surface-2);color:var(--ink);font:500 14px 'IBM Plex Mono',monospace;border-radius:0}
+.alpha-input input[type=number]:focus,.btn:focus-visible,input[type=range]:focus-visible,select:focus-visible,.chipbtn:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.presets{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.chipbtn{display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 10px;background:var(--surface-2);border:1px solid var(--border);color:var(--ink);cursor:pointer;border-radius:2px;font:500 12px 'IBM Plex Mono',monospace;min-width:60px}
+.chipbtn span:last-child{font-size:10px;color:var(--ink-3)}
+.chipbtn:hover{border-color:var(--border-strong)}
+.chipbtn.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.chipbtn.active span:last-child{color:var(--accent-ink);opacity:.8}
+.expect{margin-top:12px;font-size:13px;color:var(--ink-2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.expect b{color:var(--ink);font-weight:500}
+
+/* layout */
+.main{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:16px}
+.col{display:flex;flex-direction:column;gap:16px;min-width:0}
+@media (max-width:940px){.main{grid-template-columns:1fr}}
+@media (max-width:560px){.alpha-grid{grid-template-columns:1fr}.alpha-values{align-items:flex-start;text-align:left}}
+
+/* circuit */
+.circuit-wrap{overflow-x:auto;padding:8px 8px 4px}
+.circuit-wrap svg{display:block;width:100%;height:auto;min-width:700px}
+.wire{stroke:var(--wire-strong);stroke-width:1.5}
+.cwire{stroke:var(--wire);stroke-width:1}
+.wire-label{font:500 12px 'IBM Plex Mono',monospace;fill:var(--ink)}
+.ket{font:12px 'IBM Plex Mono',monospace;fill:var(--ink-2);text-anchor:middle}
+.gate{pointer-events:none;transition:opacity .25s}
+.gate.pending{opacity:.32}
+.gate-box{fill:var(--gate)}
+.gate.current .gate-box,.gate.current .meas-box{stroke:var(--accent);stroke-width:2.5}
+.gate-name{font:600 12px 'IBM Plex Sans',sans-serif;fill:var(--gate-ink);text-anchor:middle}
+.gate-sym{font:500 11px 'IBM Plex Mono',monospace;fill:var(--gate-ink);text-anchor:middle}
+.ctrl-dot{fill:var(--gate)}
+.ctrl-line{stroke:var(--gate);stroke-width:2}
+.angle-val{font:10px 'IBM Plex Mono',monospace;fill:var(--ink-3);text-anchor:middle}
+.step-num{font:500 10px 'IBM Plex Mono',monospace;fill:var(--ink-3);text-anchor:middle}
+.meas-box{fill:var(--surface-2);stroke:var(--ink);stroke-width:1.25}
+.meas-arc{fill:none;stroke:var(--ink);stroke-width:1.5}
+.meas-needle{stroke:var(--ink);stroke-width:1.5}
+.carrow{fill:var(--wire)}
+.playhead{transition:transform .28s ease}
+.ph-line{stroke:var(--accent);stroke-width:2}
+.ph-cap{fill:var(--accent)}
+.hit{fill:transparent;cursor:pointer}
+.hit:hover{fill:var(--accent-soft)}
+.hint{padding:0 16px 12px;font-size:12px;color:var(--ink-3)}
+
+/* transport */
+.transport{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:12px 16px;border-top:1px solid var(--border);background:var(--surface-2)}
+.btn{appearance:none;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);padding:8px 14px;font:500 13px 'IBM Plex Sans',sans-serif;cursor:pointer;border-radius:2px;display:inline-flex;align-items:center;gap:6px;min-height:36px}
+.btn:hover{background:var(--accent-soft)}
+.btn:disabled{opacity:.4;cursor:default;background:var(--surface)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);min-width:96px;justify-content:center}
+.btn.primary:hover{background:var(--accent-hover);border-color:var(--accent-hover)}
+.btn svg{width:12px;height:12px;fill:currentColor}
+select.btn{padding:6px 8px}
+.step-pos{margin-left:auto;font-size:12px;color:var(--ink-2)}
+.step-readout{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:12px;align-items:baseline;flex-wrap:wrap;min-height:44px}
+.step-readout .lbl{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:500}
+.step-readout .txt{font-size:13px}
+.step-readout .note{font-size:12px;color:var(--ink-2)}
+
+/* qasm */
+.qasm{margin:0;padding:12px 0;font:12.5px/1.6 'IBM Plex Mono',monospace;overflow-x:auto;color:var(--ink-2)}
+.qasm .ln{display:flex;gap:14px;padding:0 16px;white-space:pre}
+.qasm .n{color:var(--ink-3);width:2ch;text-align:right;flex:none;user-select:none}
+.qasm .ln.cm{color:var(--ink-3)}
+.qasm .ln.hl{background:var(--accent-soft);color:var(--ink);box-shadow:inset 3px 0 0 var(--accent)}
+.qasm .ln.done{color:var(--ink)}
+
+/* chart */
+.chart-wrap{position:relative;padding:8px 8px 0}
+.chart-wrap svg{display:block;width:100%;height:auto}
+.grid{stroke:var(--grid);stroke-width:1}
+.baseline{stroke:var(--border-strong);stroke-width:1}
+.tick{font:10px 'IBM Plex Mono',monospace;fill:var(--ink-3);text-anchor:end}
+.xlabel{font:11px 'IBM Plex Mono',monospace;fill:var(--ink-2);text-anchor:middle}
+.xindex{font:10px 'IBM Plex Mono',monospace;fill:var(--ink-3);text-anchor:middle}
+.bar{fill:var(--bar);transition:y .3s ease,height .3s ease}
+.bar.hover{fill:var(--bar-hover)}
+.ghost{fill:none;stroke:var(--ink-3);stroke-width:1;transition:y .3s ease,height .3s ease}
+.val{font:500 11px 'IBM Plex Mono',monospace;fill:var(--ink-2);text-anchor:middle}
+.chart-hit{fill:transparent}
+.tooltip{position:absolute;pointer-events:none;background:var(--ink);color:var(--bg);font:12px 'IBM Plex Mono',monospace;padding:6px 8px;border-radius:2px;white-space:nowrap;transform:translateX(-50%);z-index:2}
+.meas-banner{margin:0 16px 14px;padding:10px 12px;border-left:3px solid var(--accent);background:var(--accent-soft);display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap;font-size:13px}
+.meas-banner b{font-weight:600}
+.meas-banner .btn{min-height:30px;padding:4px 10px;font-size:12px}
+.caption{padding:0 16px 12px;font-size:12px;color:var(--ink-3)}
+
+/* statevector */
+.sv{width:100%;border-collapse:collapse;font-size:12.5px}
+.sv th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:500;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border)}
+.sv td{padding:5px 10px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+.sv tr:last-child td{border-bottom:none}
+.sv td.num{text-align:right}
+.sv th.num{text-align:right}
+.sv tr.zero td{color:var(--ink-3)}
+.sv tr.zero .amp{opacity:.55}
+.sv tr.top td{color:var(--ink);font-weight:500}
+.sv-scroll{overflow-x:auto}
+.pd{width:26px;height:26px;display:block}
+.pd .ring{fill:none;stroke:var(--border-strong);stroke-width:1}
+.pd .disc{fill:var(--accent);opacity:.35}
+.pd .needle{stroke:var(--ink);stroke-width:1.5;stroke-linecap:round}
+
+/* meters */
+.meters{display:flex;flex-direction:column;gap:12px}
+.meter-row{display:grid;grid-template-columns:58px minmax(0,1fr) 64px auto;gap:12px;align-items:center}
+.meter-label{font-size:13px;font-weight:500}
+.meter-track{height:8px;background:var(--accent-soft);position:relative;overflow:hidden;border-radius:1px}
+.meter-fill{position:absolute;inset:0 auto 0 0;background:var(--accent);transition:width .3s ease}
+.meter-val{font-size:12px;color:var(--ink-2);text-align:right}
+.chip{font-size:11px;font-weight:500;padding:3px 9px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:5px}
+.chip.good{color:var(--good-ink);background:var(--good-bg)}
+.chip.mixed{color:var(--mixed-ink);background:var(--mixed-bg)}
+.meters-note{font-size:12px;color:var(--ink-3);margin-top:12px}
+@media (max-width:560px){.meter-row{grid-template-columns:58px minmax(0,1fr) auto}.meter-val{display:none}}
+
+/* bloch spheres */
+.sw{display:inline-block;width:10px;height:10px;border-radius:1px;flex:none}
+.meter-label{display:flex;align-items:center;gap:6px}
+.bloch-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 16px;padding:12px 16px 16px}
+.bl{min-width:0}
+.bl-svg{display:block;width:100%;height:auto}
+.bl-sphere{fill:var(--surface-2);stroke:var(--border-strong);stroke-width:1}
+.bl-ring{fill:none;stroke:var(--border-strong);stroke-width:1}
+.bl-ring.b{opacity:.4}
+.bl-axis{stroke:var(--ink-3);stroke-width:1;opacity:.6}
+.bl-lab{font:11px 'IBM Plex Mono',monospace;fill:var(--ink-2);text-anchor:middle}
+.bl-trail{fill:none;stroke:currentColor;stroke-width:2;opacity:.45;stroke-linecap:round;stroke-linejoin:round}
+.bl-dot{fill:currentColor;opacity:.35}
+.bl-arrow{stroke:currentColor;stroke-width:2.5;stroke-linecap:round}
+.bl-head{fill:currentColor}
+.bl-tip{fill:currentColor;stroke:var(--surface);stroke-width:1.5}
+.bl-svg.behind .bl-arrow,.bl-svg.behind .bl-tip,.bl-svg.behind .bl-head{opacity:.55}
+.bl-head-row{display:flex;align-items:center;gap:8px;margin-top:6px;color:var(--ink)}
+.bl-head-row b{font-weight:500}
+.bl-tag{margin-left:auto;font-size:12px;color:var(--ink-2)}
+.bl-vals{font-size:12px;color:var(--ink-2);margin-top:2px;white-space:nowrap;overflow-x:auto}
+.bl-note{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+
+@media (prefers-reduced-motion: reduce){*{transition:none !important;animation:none !important}}
+</style>
+
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 21 7v10l-9 5-9-5V7z" fill="none" stroke="#78a9ff" stroke-width="1.8"/><circle cx="12" cy="12" r="3" fill="#78a9ff"/></svg>
+      <span class="brand-name">Super Parameter Composer</span>
+      <span class="brand-sub">3 qubits · 6 gates · 1 parameter · OpenQASM 3.0</span>
+    </div>
+    <div class="topbar-right mono"><span>α = <b id="top-alpha">—</b></span><span>step <b id="top-step">—</b></span></div>
+  </header>
+
+  <section class="card">
+    <div class="card-h"><h2>Global parameter</h2><span class="meta">Every gate angle in the circuit is derived from this one value</span></div>
+    <div class="card-b">
+      <div class="alpha-grid">
+        <div class="alpha-slider-wrap">
+          <label for="alpha-slider" class="eyebrow">α, in units of π</label>
+          <input type="range" id="alpha-slider" min="0" max="8" step="0.01" value="3" list="pi-ticks" aria-label="alpha in units of pi">
+          <datalist id="pi-ticks"><option value="0"></option><option value="1"></option><option value="2"></option><option value="3"></option><option value="4"></option><option value="5"></option><option value="6"></option><option value="7"></option><option value="8"></option></datalist>
+          <div class="slider-scale mono"><span>0</span><span>π</span><span>2π</span><span>3π</span><span>4π</span><span>5π</span><span>6π</span><span>7π</span><span>8π</span></div>
+        </div>
+        <div class="alpha-values">
+          <div class="alpha-big mono" id="alpha-pi">3.00<small> π</small></div>
+          <div class="alpha-rad mono" id="alpha-rad"></div>
+        </div>
+        <div class="alpha-input">
+          <label for="alpha-input">Type a multiple of π</label>
+          <input type="number" id="alpha-input" min="0" max="8" step="0.25" value="3">
+          <span>× π &nbsp;·&nbsp; PennyLane <code class="mono">alpha</code> equals this number, because the qnode uses RX(π·alpha)</span>
+        </div>
+      </div>
+      <div class="presets" id="presets" role="group" aria-label="Challenge coefficients"></div>
+      <div class="expect" id="expect"></div>
+    </div>
+  </section>
+
+  <div class="main">
+    <div class="col">
+      <section class="card">
+        <div class="card-h"><h2>Circuit</h2><span class="meta">Click a column to jump to that step · ← → step · space plays</span></div>
+        <div class="circuit-wrap"><svg id="circuit" role="img" aria-label="Three-wire quantum circuit with RX and controlled-RX gates and a measurement column"></svg></div>
+        <div class="transport">
+          <button class="btn" id="btn-reset" title="Reset to |000⟩"><svg viewBox="0 0 12 12"><path d="M6 1.5a4.5 4.5 0 1 1-4.2 2.9H3.3A3.2 3.2 0 1 0 6 2.8V4.6L2.8 2.3 6 0z"/></svg>Reset</button>
+          <button class="btn" id="btn-prev"><svg viewBox="0 0 12 12"><path d="M8.5 1v10L2.5 6z"/></svg>Prev</button>
+          <button class="btn primary" id="btn-play"><svg viewBox="0 0 12 12"><path d="M2.5 1v10l8-5z"/></svg><span id="play-label">Play</span></button>
+          <button class="btn" id="btn-next">Next<svg viewBox="0 0 12 12"><path d="M3.5 1v10l6-5z"/></svg></button>
+          <select class="btn" id="speed" aria-label="Playback speed"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="2">2×</option></select>
+          <div class="step-pos mono" id="step-pos"></div>
+        </div>
+        <div class="step-readout" aria-live="polite"><span class="lbl" id="step-lbl"></span><span class="txt mono" id="step-txt"></span><span class="note" id="step-note"></span></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><h2>Bloch spheres</h2><span class="meta">Reduced state of each qubit · an arrow shorter than the radius means that qubit is entangled with the others</span></div>
+        <div class="bloch-grid" id="bloch"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><h2>OpenQASM 3.0</h2><span class="meta">Highlighted line is the operation just applied</span></div>
+        <pre class="qasm" id="qasm"></pre>
+      </section>
+    </div>
+
+    <div class="col">
+      <section class="card">
+        <div class="card-h"><h2>Probabilities</h2><span class="meta" id="chart-meta"></span></div>
+        <div class="chart-wrap"><svg id="chart" role="img" aria-label="Bar chart of computational basis state probabilities"></svg><div class="tooltip mono" id="tooltip" hidden></div></div>
+        <div class="meas-banner" id="meas-banner" hidden></div>
+        <div class="caption" id="chart-caption"></div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><h2>Statevector</h2><span class="meta">Bit order q[0] q[1] q[2] · q[0] is the most-significant bit</span></div>
+        <div class="sv-scroll">
+        <table class="sv" id="sv">
+          <thead><tr><th></th><th>Basis</th><th class="num">Amplitude</th><th class="num">|amp|²</th><th class="num">Phase</th></tr></thead>
+          <tbody id="sv-body"></tbody>
+        </table>
+        </div>
+        <div class="caption">The disc area is |amp|² and the needle points along the phase. A global phase such as the −1 from RX(2π) is visible here but has no effect on the probabilities.</div>
+      </section>
+
+      <section class="card">
+        <div class="card-h"><h2>Per-qubit readout</h2><span class="meta">P(q[k] = 1) at this step</span></div>
+        <div class="card-b">
+          <div class="meters" id="meters"></div>
+          <div class="meters-note">A wire is <em>clean</em> when its net rotation is a whole multiple of π. The controlled gates exist to remove the lower wires' share of the angle so every wire ends clean at α = nπ.</div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const PI=Math.PI;
+const $=s=>document.querySelector(s);
+const NS='http://www.w3.org/2000/svg';
+function el(tag,attrs,parent){const e=document.createElementNS(NS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.appendChild(e);return e;}
+function h(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+
+/* ---------- complex linear algebra (no libraries) ---------- */
+const C=(re,im=0)=>[re,im];
+const cadd=(a,b)=>[a[0]+b[0],a[1]+b[1]];
+const cmul=(a,b)=>[a[0]*b[0]-a[1]*b[1],a[0]*b[1]+a[1]*b[0]];
+const cabs2=a=>a[0]*a[0]+a[1]*a[1];
+function zeros(n,m){return Array.from({length:n},()=>Array.from({length:m},()=>C(0)));}
+function kron(A,B){
+  const n=A.length,m=A[0].length,p=B.length,q=B[0].length,R=zeros(n*p,m*q);
+  for(let i=0;i<n;i++)for(let j=0;j<m;j++){const a=A[i][j];if(a[0]===0&&a[1]===0)continue;
+    for(let k=0;k<p;k++)for(let l=0;l<q;l++)R[i*p+k][j*q+l]=cmul(a,B[k][l]);}
+  return R;
+}
+const matAdd=(A,B)=>A.map((row,i)=>row.map((v,j)=>cadd(v,B[i][j])));
+const matVec=(A,v)=>A.map(row=>row.reduce((acc,a,j)=>cadd(acc,cmul(a,v[j])),C(0)));
+const I2=[[C(1),C(0)],[C(0),C(1)]];
+const P0=[[C(1),C(0)],[C(0),C(0)]];
+const P1=[[C(0),C(0)],[C(0),C(1)]];
+const RX=t=>{const c=Math.cos(t/2),s=Math.sin(t/2);return [[C(c),C(0,-s)],[C(0,-s),C(c)]];};
+/* wire 0 is the leftmost tensor factor (most-significant bit), matching qml.probs */
+function onWires(map){let M=map[0]||I2;for(let w=1;w<3;w++)M=kron(M,map[w]||I2);return M;}
+const rxOp=(w,t)=>onWires({[w]:RX(t)});
+const crxOp=(c,t,th)=>matAdd(onWires({[c]:P0}),onWires({[c]:P1,[t]:RX(th)}));
+
+/* ---------- the routine ---------- */
+const GATES=[
+  {kind:'rx', wire:2, sym:'α',   angle:a=>a,     qasm:'rx(alpha) q[2];',        note:'q[2] is the least-significant bit: one flip per π of α.'},
+  {kind:'rx', wire:1, sym:'α/2', angle:a=>a/2,   qasm:'rx(alpha / 2) q[1];',    note:'q[1] turns at half speed, so it drifts to a superposition whenever q[2] is |1⟩.'},
+  {kind:'crx',ctrl:2, tgt:1, sym:'−π/2', angle:()=>-PI/2, qasm:'crx(-pi / 2) q[2], q[1];', note:'If q[2] = 1, take π/2 back off q[1]. That is exactly q[2]’s share of the angle.'},
+  {kind:'rx', wire:0, sym:'α/4', angle:a=>a/4,   qasm:'rx(alpha / 4) q[0];',    note:'q[0] turns at quarter speed and carries the two lower bits’ share as extra angle.'},
+  {kind:'crx',ctrl:2, tgt:0, sym:'−π/4', angle:()=>-PI/4, qasm:'crx(-pi / 4) q[2], q[0];', note:'If q[2] = 1, take π/4 back off q[0].'},
+  {kind:'crx',ctrl:1, tgt:0, sym:'−π/2', angle:()=>-PI/2, qasm:'crx(-pi / 2) q[1], q[0];', note:'If q[1] = 1, take π/2 back off q[0]. Now every wire holds π × its own bit.'},
+];
+const NG=GATES.length, MEAS=NG+1; /* step indices: 0 initial, 1..6 after gate, 7 measured */
+const gateMatrix=(g,alpha)=>g.kind==='rx'?rxOp(g.wire,g.angle(alpha)):crxOp(g.ctrl,g.tgt,g.angle(alpha));
+function progression(alpha){
+  const states=[];let psi=Array.from({length:8},(_,i)=>C(i===0?1:0));states.push(psi);
+  for(const g of GATES){psi=matVec(gateMatrix(g,alpha),psi);states.push(psi);}
+  return states;
+}
+const probsOf=psi=>psi.map(cabs2);
+function sample(p){const r=Math.random();let acc=0,last=0;for(let i=0;i<p.length;i++){if(p[i]>1e-12)last=i;acc+=p[i];if(r<acc)return i;}return last;}
+const bits=i=>i.toString(2).padStart(3,'0');
+const ket=i=>`|${bits(i)}⟩`;
+
+/* ---------- state ---------- */
+const S={alphaPi:3,step:4,states:null,outcome:null,playing:false,timer:null,speed:1};
+function recompute(){S.states=progression(S.alphaPi*PI);}
+function currentPsi(){
+  if(S.step<MEAS)return S.states[S.step];
+  return Array.from({length:8},(_,i)=>C(i===S.outcome?1:0));
+}
+function setAlpha(v){
+  v=Math.min(8,Math.max(0,Number(v)||0));
+  S.alphaPi=Math.round(v*10000)/10000;
+  recompute();
+  if(S.step===MEAS)S.outcome=sample(probsOf(S.states[NG]));
+  cancelAnim();
+  renderAll();
+}
+function setStep(s){
+  s=Math.max(0,Math.min(MEAS,s));
+  const prev=S.step;
+  if(s===MEAS&&S.step!==MEAS)S.outcome=sample(probsOf(S.states[NG]));
+  S.step=s;
+  if(s===MEAS&&S.playing)stopPlay();
+  renderAll();
+  animateStep(prev,s);
+}
+function measureAgain(){S.outcome=sample(probsOf(S.states[NG]));renderAll();}
+function startPlay(){
+  if(S.step>=MEAS)S.step=0;
+  S.playing=true;
+  S.timer=setInterval(()=>{if(S.step>=MEAS){stopPlay();return;}setStep(S.step+1);},900/S.speed);
+  renderTransport();
+}
+function stopPlay(){S.playing=false;clearInterval(S.timer);S.timer=null;renderTransport();}
+
+/* ---------- formatting ---------- */
+const clean=x=>Math.abs(x)<5e-13?0:x;
+const fmt=(x,d=4)=>{x=clean(x);const s=Math.abs(x).toFixed(d);return (x<0?'−':'')+s;};
+function fmtC(a){const re=clean(a[0]),im=clean(a[1]);return `${re<0?'−':'+'}${Math.abs(re).toFixed(4)} ${im<0?'−':'+'} ${Math.abs(im).toFixed(4)}i`;}
+function fmtPi(v){const s=(Math.round(v*100)/100).toFixed(2);return s;}
+function alphaExpr(){const v=S.alphaPi;if(v===0)return '0';if(v===1)return 'pi';return Number.isInteger(v)?`${v}*pi`:`${v}*pi`;}
+const isInt=v=>Math.abs(v-Math.round(v))<1e-9;
+
+/* ---------- circuit canvas ---------- */
+const CG={x0:112,cw:92,wy:[66,126,186],yc:250,top:22};
+CG.w=CG.x0+CG.cw*7+20; CG.h=CG.yc+28;
+const CIRC={};
+function buildCircuit(){
+  const svg=$('#circuit');svg.setAttribute('viewBox',`0 0 ${CG.w} ${CG.h}`);svg.innerHTML='';
+  const hits=el('g',{},svg);
+  const mk=(x,w,step,title)=>{const r=el('rect',{x,y:CG.top,width:w,height:CG.h-CG.top,class:'hit','data-step':step},hits);const t=el('title',{},r);t.textContent=title;r.addEventListener('click',()=>{stopPlay();setStep(step);});};
+  mk(0,CG.x0,0,'Step 0 · initial state |000⟩');
+  GATES.forEach((g,i)=>mk(CG.x0+CG.cw*i,CG.cw,i+1,`Step ${i+1} · after ${g.qasm}`));
+  mk(CG.x0+CG.cw*NG,CG.cw,MEAS,`Step ${MEAS} · measurement`);
+  for(let k=0;k<3;k++){
+    el('line',{x1:CG.x0-34,y1:CG.wy[k],x2:CG.w-6,y2:CG.wy[k],class:'wire'},svg);
+    el('rect',{x:8,y:CG.wy[k]-5,width:9,height:9,rx:1,style:`fill:var(--q${k})`},svg);
+    el('text',{x:23,y:CG.wy[k]+4,class:'wire-label'},svg).textContent=`q[${k}]`;
+    el('text',{x:CG.x0-50,y:CG.wy[k]+4,class:'ket'},svg).textContent='|0⟩';
+  }
+  el('line',{x1:CG.x0-34,y1:CG.yc-1.5,x2:CG.w-6,y2:CG.yc-1.5,class:'cwire'},svg);
+  el('line',{x1:CG.x0-34,y1:CG.yc+1.5,x2:CG.w-6,y2:CG.yc+1.5,class:'cwire'},svg);
+  el('text',{x:23,y:CG.yc+4,class:'wire-label'},svg).textContent='c[3]';
+  CIRC.groups=[];CIRC.angleLabels=[];
+  GATES.forEach((g,i)=>{
+    const cx=CG.x0+CG.cw*i+CG.cw/2, tw=g.kind==='rx'?g.wire:g.tgt, ty=CG.wy[tw];
+    const grp=el('g',{class:'gate'},svg);
+    if(g.kind==='crx'){const cy=CG.wy[g.ctrl];el('line',{x1:cx,y1:cy,x2:cx,y2:cy>ty?ty+20:ty-20,class:'ctrl-line'},grp);el('circle',{cx,cy,r:5.5,class:'ctrl-dot'},grp);}
+    el('rect',{x:cx-27,y:ty-20,width:54,height:40,rx:2,class:'gate-box'},grp);
+    el('text',{x:cx,y:ty-3,class:'gate-name'},grp).textContent='RX';
+    el('text',{x:cx,y:ty+12,class:'gate-sym'},grp).textContent=g.sym;
+    CIRC.angleLabels.push(el('text',{x:cx,y:ty-27,class:'angle-val'},grp));
+    el('text',{x:cx,y:CG.h-4,class:'step-num'},grp).textContent=i+1;
+    CIRC.groups.push(grp);
+  });
+  const mg=el('g',{class:'gate meas'},svg);CIRC.meas=mg;
+  const mx=CG.x0+CG.cw*NG+CG.cw/2;
+  for(let k=0;k<3;k++){const y=CG.wy[k];el('line',{x1:mx-2,y1:y+20,x2:mx-2,y2:CG.yc-8,class:'cwire'},mg);el('line',{x1:mx+2,y1:y+20,x2:mx+2,y2:CG.yc-8,class:'cwire'},mg);}
+  el('path',{d:`M${mx-6},${CG.yc-9} L${mx+6},${CG.yc-9} L${mx},${CG.yc-1.5} Z`,class:'carrow'},mg);
+  for(let k=0;k<3;k++){const y=CG.wy[k];
+    el('rect',{x:mx-27,y:y-20,width:54,height:40,rx:2,class:'meas-box'},mg);
+    el('path',{d:`M${mx-13},${y+9} A13,13 0 0 1 ${mx+13},${y+9}`,class:'meas-arc'},mg);
+    el('line',{x1:mx,y1:y+9,x2:mx+9,y2:y-4,class:'meas-needle'},mg);
+  }
+  el('text',{x:mx,y:CG.h-4,class:'step-num'},mg).textContent='M';
+  const ph=el('g',{class:'playhead'},svg);CIRC.playhead=ph;
+  el('line',{x1:0,y1:CG.top+6,x2:0,y2:CG.yc+12,class:'ph-line'},ph);
+  el('path',{d:`M-6,${CG.top-2} L6,${CG.top-2} L0,${CG.top+7} Z`,class:'ph-cap'},ph);
+}
+function renderCircuit(){
+  const a=S.alphaPi*PI;
+  GATES.forEach((g,i)=>{
+    const grp=CIRC.groups[i];
+    grp.classList.toggle('pending',i>=S.step);
+    grp.classList.toggle('current',S.step===i+1);
+    CIRC.angleLabels[i].textContent=`${fmt(g.angle(a),3)} rad`;
+  });
+  CIRC.meas.classList.toggle('pending',S.step<MEAS);
+  CIRC.meas.classList.toggle('current',S.step===MEAS);
+  CIRC.playhead.style.transform=`translateX(${CG.x0+CG.cw*S.step}px)`;
+}
+
+/* ---------- probability chart ---------- */
+const CH={w:440,h:236,ml:40,mr:12,mt:24,mb:44};
+CH.pw=CH.w-CH.ml-CH.mr;CH.ph=CH.h-CH.mt-CH.mb;CH.y0=CH.mt+CH.ph;CH.slot=CH.pw/8;CH.bw=22;
+const CHART={};
+function buildChart(){
+  const svg=$('#chart');svg.setAttribute('viewBox',`0 0 ${CH.w} ${CH.h}`);svg.innerHTML='';
+  const defs=el('defs',{},svg);el('rect',{x:0,y:0,width:CH.w,height:CH.y0},el('clipPath',{id:'clipBase'},defs));
+  [0,.25,.5,.75,1].forEach(v=>{const y=CH.mt+(1-v)*CH.ph;el('line',{x1:CH.ml,y1:y,x2:CH.w-CH.mr,y2:y,class:'grid'},svg);el('text',{x:CH.ml-6,y:y+3.5,class:'tick'},svg).textContent=v.toFixed(2);});
+  CHART.ghosts=[];CHART.bars=[];CHART.vals=[];
+  const gG=el('g',{'clip-path':'url(#clipBase)'},svg),gB=el('g',{'clip-path':'url(#clipBase)'},svg);
+  for(let i=0;i<8;i++){
+    const cx=CH.ml+CH.slot*(i+.5);
+    CHART.ghosts.push(el('rect',{x:cx-CH.bw/2,y:CH.y0,width:CH.bw,height:0,rx:4,class:'ghost'},gG));
+    CHART.bars.push(el('rect',{x:cx-CH.bw/2,y:CH.y0,width:CH.bw,height:0,rx:4,class:'bar'},gB));
+    el('text',{x:cx,y:CH.y0+17,class:'xlabel'},svg).textContent=ket(i);
+    el('text',{x:cx,y:CH.y0+31,class:'xindex'},svg).textContent=i;
+    CHART.vals.push(el('text',{x:cx,y:CH.y0-6,class:'val'},svg));
+  }
+  el('line',{x1:CH.ml,y1:CH.y0,x2:CH.w-CH.mr,y2:CH.y0,class:'baseline'},svg);
+  const tip=$('#tooltip');
+  for(let i=0;i<8;i++){
+    const hit=el('rect',{x:CH.ml+CH.slot*i,y:CH.mt-12,width:CH.slot,height:CH.ph+12,class:'chart-hit'},svg);
+    hit.addEventListener('mouseenter',()=>{
+      const psi=currentPsi(),p=cabs2(psi[i]);
+      tip.textContent=`${ket(i)}  p = ${p.toFixed(4)}  amp = ${fmtC(psi[i])}`;tip.hidden=false;
+      const wrap=$('.chart-wrap').getBoundingClientRect(),r=hit.getBoundingClientRect();
+      let left=r.left-wrap.left+r.width/2;const half=tip.offsetWidth/2+6;left=Math.max(half,Math.min(wrap.width-half,left));
+      tip.style.left=left+'px';tip.style.top='6px';CHART.bars[i].classList.add('hover');
+    });
+    hit.addEventListener('mouseleave',()=>{tip.hidden=true;CHART.bars[i].classList.remove('hover');});
+  }
+}
+function setBar(rect,p){const hgt=p*CH.ph,y=CH.y0-hgt,hh=hgt>0.01?hgt+4:0;rect.setAttribute('y',y);rect.setAttribute('height',hh);rect.style.y=y+'px';rect.style.height=hh+'px';}
+function renderChart(){
+  const psi=currentPsi(),p=probsOf(psi);
+  const pre=S.step===MEAS?probsOf(S.states[NG]):null;
+  for(let i=0;i<8;i++){
+    setBar(CHART.bars[i],p[i]);
+    setBar(CHART.ghosts[i],pre?pre[i]:0);
+    const v=CHART.vals[i];
+    if(p[i]>0.0005){v.textContent=p[i].toFixed(3);v.setAttribute('y',CH.y0-p[i]*CH.ph-6);}else v.textContent='';
+  }
+  $('#chart-meta').textContent=S.step===MEAS?'after measurement':S.step===0?'initial state':`after gate ${S.step} of ${NG}`;
+  const banner=$('#meas-banner');
+  if(S.step===MEAS){
+    banner.hidden=false;banner.innerHTML='';
+    const o=S.outcome,b=bits(o);
+    banner.append(h('span',null,'Collapsed to '),h('b','mono',ket(o)),h('span','mono',`c[0]=${b[0]}  c[1]=${b[1]}  c[2]=${b[2]}`));
+    const pm=pre[o];banner.append(h('span',null,`Sampled with probability ${pm.toFixed(4)}.`));
+    const again=h('button','btn',pm>0.999999?'Measure again (deterministic)':'Measure again');again.id='btn-measure';again.addEventListener('click',measureAgain);banner.append(again);
+    $('#chart-caption').textContent='Solid bars are the collapsed state. Outlines show the distribution the outcome was drawn from.';
+  }else{
+    banner.hidden=true;
+    const n=p.filter(x=>x>1e-9).length;
+    $('#chart-caption').textContent=n===1?'A single bar at height 1: the register is exactly in a computational basis state.':`${n} basis states carry weight: the register is in a superposition at this step.`;
+  }
+}
+
+/* ---------- statevector table ---------- */
+const SV={rows:[]};
+function buildSV(){
+  const tb=$('#sv-body');tb.innerHTML='';SV.rows=[];
+  for(let i=0;i<8;i++){
+    const tr=h('tr');
+    const tdD=h('td');const svg=el('svg',{viewBox:'-13 -13 26 26',class:'pd','aria-hidden':'true'},tdD);
+    el('circle',{cx:0,cy:0,r:11,class:'ring'},svg);const disc=el('circle',{cx:0,cy:0,r:0,class:'disc'},svg);const needle=el('line',{x1:0,y1:0,x2:0,y2:0,class:'needle'},svg);
+    const tdB=h('td','mono',ket(i)),tdA=h('td','mono num amp'),tdP=h('td','mono num'),tdPh=h('td','mono num');
+    tr.append(tdD,tdB,tdA,tdP,tdPh);tb.append(tr);
+    SV.rows.push({tr,disc,needle,tdA,tdP,tdPh});
+  }
+}
+function renderSV(){
+  const psi=currentPsi();
+  psi.forEach((a,i)=>{
+    const r=SV.rows[i],p=cabs2(a),mag=Math.sqrt(p);
+    r.tdA.textContent=fmtC(a);r.tdP.textContent=p.toFixed(4);
+    if(p<1e-12){r.tdPh.textContent='—';r.disc.setAttribute('r',0);r.needle.setAttribute('x2',0);r.needle.setAttribute('y2',0);}
+    else{const ph=Math.atan2(clean(a[1]),clean(a[0]));r.tdPh.textContent=`${fmt(ph*180/PI,1)}°`;r.disc.setAttribute('r',11*mag);r.needle.setAttribute('x2',11*Math.cos(ph));r.needle.setAttribute('y2',-11*Math.sin(ph));}
+    r.tr.classList.toggle('zero',p<1e-12);r.tr.classList.toggle('top',p>0.999999);
+  });
+}
+
+/* ---------- per-qubit meters ---------- */
+const MT={rows:[]};
+function buildMeters(){
+  const box=$('#meters');box.innerHTML='';MT.rows=[];
+  for(let k=0;k<3;k++){
+    const row=h('div','meter-row');const lbl=h('div','meter-label mono');const sw=h('span','sw');sw.style.background=`var(--q${k})`;lbl.append(sw,document.createTextNode(`q[${k}]`));
+    const track=h('div','meter-track');track.style.background=`color-mix(in srgb, var(--q${k}) 18%, var(--surface))`;const fill=h('div','meter-fill');fill.style.background=`var(--q${k})`;track.append(fill);
+    const val=h('div','meter-val mono');const chip=h('span','chip');
+    row.append(lbl,track,val,chip);box.append(row);MT.rows.push({fill,val,chip});
+  }
+}
+function renderMeters(){
+  const p=probsOf(currentPsi());
+  for(let k=0;k<3;k++){
+    let p1=0;for(let i=0;i<8;i++)if((i>>(2-k))&1)p1+=p[i];
+    const r=MT.rows[k];r.fill.style.width=(p1*100).toFixed(2)+'%';r.val.textContent=p1.toFixed(4);
+    if(p1<1e-9){r.chip.className='chip good';r.chip.textContent='✓ clean |0⟩';}
+    else if(p1>1-1e-9){r.chip.className='chip good';r.chip.textContent='✓ clean |1⟩';}
+    else{r.chip.className='chip mixed';r.chip.textContent='◐ superposed';}
+  }
+}
+
+/* ---------- Bloch spheres ---------- */
+const BL={R:80,cx:110,cy:118,w:220,h:224,az:-35*PI/180,el:22*PI/180,items:[],arc:{key:null,pts:null}};
+/* orthographic camera: z up, +x toward the viewer (down-left), +y to the right */
+function project(p){
+  const ca=Math.cos(BL.az),sa=Math.sin(BL.az),ce=Math.cos(BL.el),se=Math.sin(BL.el);
+  const x1=p[0]*ca-p[1]*sa,y1=p[0]*sa+p[1]*ca,z1=p[2];
+  return [BL.cx+BL.R*y1, BL.cy-BL.R*(-x1*se+z1*ce), x1*ce+z1*se];
+}
+/* reduced density matrix of qubit k (k = 0 is the most-significant bit) traced over the other two */
+function reduced(psi,k){
+  const sh=2-k;let r00=0,r11=0,re01=0,im01=0;
+  for(let i=0;i<8;i++){
+    const b=(i>>sh)&1,pr=cabs2(psi[i]);if(b)r11+=pr;else r00+=pr;
+    if(!b){const a=psi[i],c=psi[i|(1<<sh)];re01+=a[0]*c[0]+a[1]*c[1];im01+=a[1]*c[0]-a[0]*c[1];}
+  }
+  return {r00,r11,re01,im01};
+}
+/* rho = (I + x X + y Y + z Z)/2  =>  x = 2 Re rho01, y = -2 Im rho01, z = rho00 - rho11 */
+function blochVec(psi,k){const m=reduced(psi,k);return [2*m.re01,-2*m.im01,m.r00-m.r11];}
+const gateAt=(g,alpha,t)=>g.kind==='rx'?rxOp(g.wire,g.angle(alpha)*t):crxOp(g.ctrl,g.tgt,g.angle(alpha)*t);
+/* state part-way (fraction t) through gate number `step` */
+const psiAt=(step,t)=>matVec(gateAt(GATES[step-1],S.alphaPi*PI,t),S.states[step-1]);
+function greatCircle(svg,fn){
+  const N=96;let dF='',dB='',penF=false,penB=false;
+  for(let i=0;i<=N;i++){const q=project(fn(2*PI*i/N)),s=q[0].toFixed(2)+','+q[1].toFixed(2);
+    if(q[2]>=0){dF+=(penF?'L':'M')+s;penF=true;penB=false;}else{dB+=(penB?'L':'M')+s;penB=true;penF=false;}}
+  el('path',{d:dB,class:'bl-ring b'},svg);el('path',{d:dF,class:'bl-ring f'},svg);
+}
+function buildBloch(){
+  const grid=$('#bloch');grid.innerHTML='';BL.items=[];
+  for(let k=0;k<3;k++){
+    const item=h('div','bl');item.style.color=`var(--q${k})`;
+    const svg=el('svg',{viewBox:`0 0 ${BL.w} ${BL.h}`,class:'bl-svg',role:'img','aria-label':`Bloch sphere of qubit ${k}`},item);
+    el('circle',{cx:BL.cx,cy:BL.cy,r:BL.R,class:'bl-sphere'},svg);
+    greatCircle(svg,t=>[Math.cos(t),Math.sin(t),0]);
+    greatCircle(svg,t=>[Math.cos(t),0,Math.sin(t)]);
+    greatCircle(svg,t=>[0,Math.cos(t),Math.sin(t)]);
+    [[1,0,0],[0,1,0],[0,0,1]].forEach(ax=>{const a=project(ax.map(v=>-v)),b=project(ax);el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],class:'bl-axis'},svg);});
+    const lab=(p,txt)=>{const q=project(p);el('text',{x:q[0],y:q[1]+4,class:'bl-lab'},svg).textContent=txt;};
+    lab([0,0,1.22],'|0⟩');lab([0,0,-1.22],'|1⟩');lab([1.22,0,0],'x');lab([0,1.2,0],'y');
+    const hist=el('g',{},svg),trail=el('path',{d:'',class:'bl-trail'},svg);
+    const arrow=el('line',{x1:BL.cx,y1:BL.cy,x2:BL.cx,y2:BL.cy,class:'bl-arrow'},svg);
+    const head=el('path',{d:'',class:'bl-head'},svg),tip=el('circle',{cx:BL.cx,cy:BL.cy,r:4,class:'bl-tip'},svg);
+    const row=h('div','bl-head-row');const sw=h('span','sw');sw.style.background=`var(--q${k})`;row.append(sw,h('b','mono',`q[${k}]`));const tag=h('span','bl-tag mono');row.append(tag);
+    const vals=h('div','bl-vals mono'),note=h('div','bl-note');
+    item.append(row,vals,note);grid.append(item);
+    BL.items.push({svg,hist,trail,arrow,head,tip,tag,vals,note});
+  }
+}
+function arcPoints(){
+  if(S.step<1||S.step>NG)return null;
+  const key=`${S.alphaPi}|${S.step}`;if(BL.arc.key===key)return BL.arc.pts;
+  const N=32,pts=[[],[],[]];
+  for(let i=0;i<=N;i++){const psi=psiAt(S.step,i/N);for(let k=0;k<3;k++)pts[k].push(blochVec(psi,k));}
+  BL.arc={key,pts};return pts;
+}
+function renderBloch(psi,partial){
+  const arc=arcPoints();
+  for(let k=0;k<3;k++){
+    const it=BL.items[k],v=blochVec(psi,k),len=Math.hypot(v[0],v[1],v[2]),[X,Y,d]=project(v);
+    it.arrow.setAttribute('x2',X);it.arrow.setAttribute('y2',Y);it.tip.setAttribute('cx',X);it.tip.setAttribute('cy',Y);
+    const dx=X-BL.cx,dy=Y-BL.cy,L=Math.hypot(dx,dy);
+    if(L>8){const ux=dx/L,uy=dy/L,hx=X-ux*11,hy=Y-uy*11;it.head.setAttribute('d',`M${X},${Y} L${hx-uy*4.5},${hy+ux*4.5} L${hx+uy*4.5},${hy-ux*4.5} Z`);}else it.head.setAttribute('d','');
+    it.svg.classList.toggle('behind',d<0&&len>0.05);
+    if(arc){const pts=arc[k],n=partial==null?pts.length:Math.max(1,Math.floor(partial*(pts.length-1))+1);
+      let dd='';for(let i=0;i<n;i++){const q=project(pts[i]);dd+=(i?'L':'M')+q[0].toFixed(2)+','+q[1].toFixed(2);}
+      if(partial!=null)dd+=`L${X.toFixed(2)},${Y.toFixed(2)}`;it.trail.setAttribute('d',dd);}
+    else it.trail.setAttribute('d','');
+    it.hist.innerHTML='';const upto=S.step===MEAS?NG+1:S.step;
+    for(let s2=0;s2<upto;s2++){const q=project(blochVec(S.states[s2],k));el('circle',{cx:q[0],cy:q[1],r:2.2,class:'bl-dot'},it.hist);}
+    it.tag.textContent=`|r| = ${len.toFixed(2)}`;
+    it.vals.textContent=`x ${fmt(v[0],2)}   y ${fmt(v[1],2)}   z ${fmt(v[2],2)}`;
+    if(len<1e-9)it.note.textContent='maximally mixed · no direction';
+    else{const th=Math.acos(Math.max(-1,Math.min(1,v[2]/len)))*180/PI,ph=Math.atan2(clean(v[1]),clean(v[0]))*180/PI;
+      it.note.textContent=(len<0.999?'entangled with the others · ':'pure · ')+`θ = ${fmt(th,1)}°  φ = ${fmt(ph,1)}°`;}
+  }
+}
+const REDUCED=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+const ANIM={raf:null};
+function cancelAnim(){if(ANIM.raf){cancelAnimationFrame(ANIM.raf);ANIM.raf=null;}}
+function animateStep(from,to){
+  cancelAnim();
+  if(REDUCED||Math.abs(from-to)!==1||from===MEAS||to===MEAS)return;
+  const gstep=Math.max(from,to),fwd=to>from,dur=fwd?560:420,t0=performance.now();
+  const ease=x=>x<.5?2*x*x:1-Math.pow(-2*x+2,2)/2;
+  renderBloch(psiAt(gstep,fwd?0:1),fwd?0:1);
+  const frame=now=>{const u=Math.min(1,(now-t0)/dur),t=fwd?ease(u):1-ease(u);renderBloch(psiAt(gstep,t),t);
+    if(u<1)ANIM.raf=requestAnimationFrame(frame);else{ANIM.raf=null;renderBloch(currentPsi());}};
+  ANIM.raf=requestAnimationFrame(frame);
+}
+
+/* ---------- QASM listing ---------- */
+const QASM_LINES=[
+  {t:'OPENQASM 3.0;'},{t:'include "stdgates.inc";'},{t:()=>`angle alpha = ${alphaExpr()};`},{t:'qubit q[3];',step:0},{t:'bit c[3];'},{t:''},
+  {t:'// Wire 2 (LSB)',cm:true},{t:GATES[0].qasm,step:1},
+  {t:'// Wire 1',cm:true},{t:GATES[1].qasm,step:2},{t:GATES[2].qasm,step:3},
+  {t:'// Wire 0 (MSB)',cm:true},{t:GATES[3].qasm,step:4},{t:GATES[4].qasm,step:5},{t:GATES[5].qasm,step:6},
+  {t:''},{t:'c = measure q;',step:MEAS},
+];
+function renderQasm(){
+  const pre=$('#qasm');pre.innerHTML='';
+  QASM_LINES.forEach((L,i)=>{
+    const ln=h('div','ln');if(L.cm)ln.classList.add('cm');
+    if(L.step!=null){if(L.step===S.step)ln.classList.add('hl');else if(L.step<S.step)ln.classList.add('done');}
+    ln.append(h('span','n',String(i+1)),h('span',null,typeof L.t==='function'?L.t():L.t));
+    pre.append(ln);
+  });
+}
+
+/* ---------- controls ---------- */
+function renderAlpha(){
+  const v=S.alphaPi;
+  $('#alpha-pi').innerHTML=`${fmtPi(v)}<small> π</small>`;
+  $('#alpha-rad').textContent=`= ${(v*PI).toFixed(4)} rad · PennyLane alpha = ${fmtPi(v)}`;
+  $('#top-alpha').textContent=`${fmtPi(v)}π`;
+  const sl=$('#alpha-slider');if(Number(sl.value)!==v)sl.value=v;
+  const inp=$('#alpha-input');if(document.activeElement!==inp&&Number(inp.value)!==v)inp.value=v;
+  document.querySelectorAll('.chipbtn').forEach(b=>b.classList.toggle('active',Number(b.dataset.n)===v));
+  const ex=$('#expect');ex.innerHTML='';
+  if(isInt(v)&&v>=0&&v<=7){const n=Math.round(v);ex.append(h('span',null,'Challenge coefficient '),h('b','mono',`n = ${n}`),h('span',null,' → after all six gates the register must be exactly '),h('b','mono',ket(n)),h('span',null,'.'));}
+  else if(isInt(v)){ex.append(h('span',null,'8π is outside the eight challenge coefficients, but it is still a multiple of π: every wire is clean and the register wraps back to '),h('b','mono','|000⟩'),h('span',null,'.'));}
+  else ex.append(h('span',null,'Not a challenge coefficient. At least one wire has a net angle that is not a whole multiple of π, so the final state is a superposition. Watch the per-qubit readout.'));
+}
+function renderTransport(){
+  $('#btn-prev').disabled=S.step===0;$('#btn-next').disabled=S.step===MEAS;
+  $('#play-label').textContent=S.playing?'Pause':(S.step===MEAS?'Replay':'Play');
+  $('#btn-play').querySelector('svg').innerHTML=S.playing?'<path d="M2 1h3v10H2zM7 1h3v10H7z"/>':'<path d="M2.5 1v10l8-5z"/>';
+  $('#step-pos').textContent=`Step ${S.step} / ${MEAS}`;$('#top-step').textContent=`${S.step}/${MEAS}`;
+  const lbl=$('#step-lbl'),txt=$('#step-txt'),note=$('#step-note');
+  if(S.step===0){lbl.textContent='Initial';txt.textContent='|000⟩';note.textContent='All three qubits start in |0⟩. Nothing has been applied yet.';}
+  else if(S.step===MEAS){lbl.textContent='Measured';txt.textContent='c = measure q;';note.textContent='The register collapsed to one basis state. Use “Measure again” to resample from the pre-measurement distribution.';}
+  else{const g=GATES[S.step-1];lbl.textContent=`After gate ${S.step}`;txt.textContent=g.qasm;note.textContent=g.note;}
+}
+function renderAll(){renderAlpha();renderCircuit();renderChart();renderSV();renderMeters();renderBloch(currentPsi());renderQasm();renderTransport();}
+
+function bindUI(){
+  const presets=$('#presets');
+  for(let n=0;n<=7;n++){const b=h('button','chipbtn');b.type='button';b.dataset.n=n;b.append(h('span',null,n===0?'0':n===1?'π':`${n}π`),h('span','mono',ket(n)));b.addEventListener('click',()=>setAlpha(n));presets.append(b);}
+  $('#alpha-slider').addEventListener('input',e=>setAlpha(e.target.value));
+  $('#alpha-input').addEventListener('input',e=>{if(e.target.value!=='')setAlpha(e.target.value);});
+  $('#alpha-input').addEventListener('blur',e=>{e.target.value=S.alphaPi;});
+  $('#btn-reset').addEventListener('click',()=>{stopPlay();setStep(0);});
+  $('#btn-prev').addEventListener('click',()=>{stopPlay();setStep(S.step-1);});
+  $('#btn-next').addEventListener('click',()=>{stopPlay();setStep(S.step+1);});
+  $('#btn-play').addEventListener('click',()=>{S.playing?stopPlay():startPlay();});
+  $('#speed').addEventListener('change',e=>{S.speed=Number(e.target.value);if(S.playing){stopPlay();startPlay();}});
+  document.addEventListener('keydown',e=>{
+    const tag=(e.target.tagName||'').toLowerCase();if(tag==='input'||tag==='select'||tag==='textarea')return;
+    if(e.key==='ArrowRight'){e.preventDefault();stopPlay();setStep(S.step+1);}
+    else if(e.key==='ArrowLeft'){e.preventDefault();stopPlay();setStep(S.step-1);}
+    else if(e.key===' '){e.preventDefault();S.playing?stopPlay():startPlay();}
+    else if(e.key==='Home'){stopPlay();setStep(0);}
+    else if(e.key==='End'){stopPlay();setStep(MEAS);}
+  });
+}
+
+function start(data){
+  if(data&&typeof data.alphaPi==='number'&&isFinite(data.alphaPi))S.alphaPi=Math.min(8,Math.max(0,data.alphaPi));
+  if(data&&Number.isInteger(data.step))S.step=Math.max(0,Math.min(MEAS,data.step));
+  if(data&&Number.isInteger(data.outcome))S.outcome=data.outcome;
+  recompute();
+  if(S.step===MEAS&&S.outcome==null)S.outcome=sample(probsOf(S.states[NG]));
+  buildCircuit();buildChart();buildSV();buildMeters();buildBloch();bindUI();renderAll();
+}
+if(window.claude&&window.claude.hot&&window.claude.hot.snapshot)window.claude.hot.snapshot(()=>({alphaPi:S.alphaPi,step:S.step,outcome:S.outcome}));
+if(window.claude&&window.claude.hot&&window.claude.hot.ready)window.claude.hot.ready(start);else start((window.claude&&window.claude.hot&&window.claude.hot.data)||{});
+})();
+</script>
