@@ -1,5 +1,7 @@
 # The Super Parameter
 
+**▶ Open the interactive simulator:** https://oussema-t.github.io/pennylane-super-parameter/simulator/
+
 One parameter, eight basis states. A solution to the PennyLane coding challenge
 [*The Super Parameter*](https://pennylane.ai/challenges/superparameter)
 (QHack 2023 Flashback, intermediate, quantum machine learning), together with a
@@ -99,6 +101,8 @@ The minute is the challenge's own continuity check: it evaluates the circuit at
 ## Interactive simulator
 
 ![Simulator screenshot](simulator/screenshot.png)
+
+Live version: **https://oussema-t.github.io/pennylane-super-parameter/simulator/** (served by GitHub Pages from this repo).
 
 `simulator/index.html` is a single file with no dependencies beyond Google Fonts.
 All 3-qubit math is written in plain JavaScript: `RX` as a 2×2 complex matrix,
